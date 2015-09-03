@@ -450,7 +450,7 @@ function schedule_posts_calendar_lang()
 		echo '    dhtmlXCalendarObject.prototype.langData["wordpress"] = {' . "\n";
 
 		// Check to see if we're using the WordPress translation or not
-		if( $options['override-translation'] == 1 )
+		if( array_key_exists( 'override-translation', $options ) && $options['override-translation'] == 1 )
 			{
 			// Overriding may be useful if the WordPress functions don't return 'good' translations.
 			echo '        monthesFNames: ["' . $options['FMNJanuary'] . '","' . $options['FMNFebruary'] . '","' . $options['FMNMarch'] . '","' . $options['FMNApril'] . '","' . $options['FMNMay'] . '","' . $options['FMNJune'] . '","' . $options['FMNJuly'] . '","' . $options['FMNAugust'] . '","' . $options['FMNSeptember'] . '","' . $options['FMNOctober'] . '","' . $options['FMNNovember'] . '","' . $options['FMNDecember'] . '"],' . "\n";
