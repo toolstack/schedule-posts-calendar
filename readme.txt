@@ -5,7 +5,7 @@ Author URI: http://toolstack.com
 Tags: admin, posts, calendar
 Requires at least: 3.0.0
 Tested up to: 4.3
-Stable tag: 5.0
+Stable tag: 5.1
 
 Adds a JavaScript calendar to the scheduled publish widget to allow you to select a date and time graphically instead of via the text entry boxes.
 
@@ -47,6 +47,11 @@ If you are using IE in compatibility mode the calendar will overlap other areas,
 7. The schedule mode in the posts/pages list.
 
 == Changelog ==
+= 5.1 =
+* Release date: February 5, 2016
+* Fixed: Cleaned up some WP_DEBUG messages.
+* Fixed: Incorrect month set when the today button was pressed with the popup calendar enabled.
+
 = 5.0 =
 * Release date: April 3, 2015
 * Added "wordpress" theme that copies the colors from the current wordpress admin theme.
@@ -126,7 +131,7 @@ If you are using IE in compatibility mode the calendar will overlap other areas,
 * Initial release.
 
 == Upgrade Notice ==
-= 4.3 =
+= 5.1 =
 None.
 
 == Roadmap ==
