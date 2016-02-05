@@ -80,6 +80,7 @@ function scp_calendar_today()
 
 	var sDay = new String(currentDate.getDate());
 	var sMon = new String(currentDate.getMonth());
+	var sMonReal = new String(currentDate.getMonth()+1);
 	var sYear = new String(currentDate.getFullYear());
 	var sHour = new String(currentDate.getHours());
 	var sMin = new String(currentDate.getMinutes());
@@ -87,19 +88,19 @@ function scp_calendar_today()
 	var dateString = '';
 	if( sDay.length < 2 ) { sDay = '0' + sDay; }
 	dateString += sDay + '/';
-	if( sMon.length < 2 ) { sMon = '0' + sMon; }
-	dateString += sMon + '/' + sYear + ' ';
+	if( sMonReal.length < 2 ) { sMonReal = '0' + sMonReal; }
+	dateString += sMonReal + '/' + sYear + ' ';
 	if( sHour.length < 2 ) { sHour = '0' + sHour; }
 	dateString += sHour + ':';
 	if( sMin.length < 2 ) { sMin = '0' + sMin; }
 	dateString += sMin;
-	
+
 	document.getElementById('mm').selectedIndex = sMon;
 	document.getElementById('jj').value = sDay;
 	document.getElementById('aa').value = sYear;
 	document.getElementById('hh').value = sHour;
 	document.getElementById('mn').value = sMin;
-	
+
 	document.getElementById('calendarHere').value = dateString;
 	}
 
