@@ -47,6 +47,10 @@ If you are using IE in compatibility mode the calendar will overlap other areas,
 7. The schedule mode in the posts/pages list.
 
 == Changelog ==
+= 5.2 =
+* Release date: TBD
+* Updated calendar code to v4.6.
+
 = 5.1 =
 * Release date: February 5, 2016
 * Fixed: Cleaned up some WP_DEBUG messages.
