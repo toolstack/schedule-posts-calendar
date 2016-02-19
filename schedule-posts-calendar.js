@@ -159,7 +159,7 @@ function scp_add_calendar()
 		var themenumber = scp_get_script_variable(GSI, 'theme', '1');
 		var popupCalendar = scp_get_script_variable(GSI, 'popupcalendar', 0);
 		var theme = '';
-		var calheight = '230px';
+		var calheight = '250px';
 		
 		switch( themenumber )
 			{
@@ -172,6 +172,7 @@ function scp_add_calendar()
 				break;
 			case '2':
 				theme = 'dhx_skyblue';
+				calheight = '250px';
 				break;
 			default:
 				theme = 'wordpress';

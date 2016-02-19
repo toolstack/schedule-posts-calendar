@@ -118,9 +118,11 @@ function scp_add_calendar(sDay, sMon, sYear, sHour, sMin, id)
 				break;
 			case '3':
 				theme = 'dhx_web';
+				parent.style.height = '250px';
 				break;
 			case '2':
 				theme = 'dhx_skyblue';
+				parent.style.height = '250px';
 				break;
 			default:
 				theme = 'wordpress';
@@ -155,7 +157,6 @@ function scp_add_calendar(sDay, sMon, sYear, sHour, sMin, id)
 
 		SchedulePostsCalendar.show();
 				
-	
 		if( theme == 'wordpress' ) {
 				scp_copy_admin_theme();
 			}
