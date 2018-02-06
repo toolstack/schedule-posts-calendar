@@ -26,11 +26,7 @@ This code is released under the GPL v2, see license.txt for details.
 
 = What browsers are supported? =
 
-Try it and find out, the JavaScript to insert the calendar is pretty standard and has been tested on:
-
-	* IE9 (note, do NOT use compatibility mode)
-	* Opera 11.6+
-	* FireFox 10+
+Try it and find out, the JavaScript to insert the calendar is pretty standard and should support any reasonably modern browser.
 
 = Why is the calendar overlapping the other areas? =
 
@@ -49,7 +45,9 @@ If you are using IE in compatibility mode the calendar will overlap other areas,
 == Changelog ==
 = 5.2 =
 * Release date: TBD
-* Updated calendar code to v4.6.
+* Updated calendar code to v5.1.
+* Fixed bug where post dates at the end of a month would wrap if the current month had lest days in it.
+* Fixed PHP warning if the options had not yet been saved.
 
 = 5.1 =
 * Release date: February 5, 2016
@@ -102,7 +100,7 @@ If you are using IE in compatibility mode the calendar will overlap other areas,
 
 = 3.2 =
 * Release date: July 18, 2012
-* Minor update, in previous versions if you use the quick edit mode and make a change to the scheduled date it would not update the scheduled date in the list. 
+* Minor update, in previous versions if you use the quick edit mode and make a change to the scheduled date it would not update the scheduled date in the list.
 * Test up to WordPress 3.4.1.
 
 = 3.1 =
@@ -117,7 +115,7 @@ If you are using IE in compatibility mode the calendar will overlap other areas,
 * Release date: March 10, 2012
 * Minor bug fix that caused the in-line calendar to start one month in the future.
 
-= 2.0 = 
+= 2.0 =
 * Release date: March 8. 2012
 * Created settings page.
 * Added options to set the start of the week.

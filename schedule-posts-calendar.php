@@ -19,27 +19,30 @@ This software is released under the GPL v2.0, see license.txt for details
 define( 'SCHEDULEPOSTCALENDARVERSION', '5.1' );
 
 /*
- 	This function is called to add the .css and .js files for the calendar to 
+ 	This function is called to add the .css and .js files for the calendar to
     the WordPress pages.
-	
+
  	It's registered at the end of the file with an add_action() call.
 */
-function schedule_posts_calendar_add_cal($theme_num, $url) 
+function schedule_posts_calendar_add_cal($theme_num, $url)
 	{
 	// Register and enqueue the calendar css files, create a theme string to use later during the JavaScript inclusion.
 	switch( $theme_num )
 		{
 		case 2:
-			wp_register_style( 'dhtmlxcalendar_style', $url . '/skins/skyblue/dhtmlxcalendar.css' );
+			wp_register_style( 'dhtmlxcalendar_style', $url . '/skins/css/dhtmlxcalendar_dhx_skyblue.css' );
 			break;
 		case 3:
-			wp_register_style( 'dhtmlxcalendar_style', $url . '/skins/web/dhtmlxcalendar.css' );
+			wp_register_style( 'dhtmlxcalendar_style', $url . '/skins/css/dhtmlxcalendar_dhx_web.css' );
 			break;
 		case 4:
-			wp_register_style( 'dhtmlxcalendar_style', $url . '/skins/terrace/dhtmlxcalendar.css' );
+			wp_register_style( 'dhtmlxcalendar_style', $url . '/skins/css/dhtmlxcalendar_dhx_terrace.css' );
+			break;
+		case 5:
+			wp_register_style( 'dhtmlxcalendar_style', $url . '/skins/css/dhtmlxcalendar_material.css' );
 			break;
 		default:
-			wp_register_style( 'dhtmlxcalendar_style', $url . '/skins/wordpress/dhtmlxcalendar.css' );
+			wp_register_style( 'dhtmlxcalendar_style', $url . '/skins/css/dhtmlxcalendar_wordpress.css' );
 			break;
 		}
 
@@ -56,31 +59,31 @@ function schedule_posts_calendar_add_cal($theme_num, $url)
  	This function is called to add the .css and .js files to the WordPress pages.
  	It's registered at the end of the file with an add_action() call.
 */
-function schedule_posts_calendar() 
+function schedule_posts_calendar()
 	{
 	// Find out where our plugin is stored.
 	$plugin_url = plugins_url( '', __FILE__ );
-	
+
 	// Retrieve the options.
 	$options = get_option( 'schedule_posts_calendar' );
-	
+
 	if( !isset($options['theme']) ) { $options['theme'] = 4; }
-	
+
 	// Register and enqueue the calendar css files, create a theme string to use later during the JavaScript inclusion.
 	schedule_posts_calendar_add_cal( $options['theme'], $plugin_url );
-	
+
 	// Add the css file that will hide the default WordPress timestamp field.
 	if( array_key_exists( 'hide-timestamp', $options ) && $options['hide-timestamp'] == 1 )
 		{
 		wp_register_style( 'hide-timestamp', $plugin_url . '/hide-timestamp.css' );
 		wp_enqueue_style( 'hide-timestamp' );
 		}
-	
+
 
 	if( ! array_key_exists( 'theme', $options ) ) { $options['theme'] = false; }
 	if( ! array_key_exists( 'startofweek', $options ) ) { $options['startofweek'] = false; }
 	if( ! array_key_exists( 'popup-calendar', $options ) ) { $options['popup-calendar'] = false; }
-	
+
 	// Register and enqueue the calender scripts.
 	wp_register_script( 'schedulepostscalendar', $plugin_url . '/schedule-posts-calendar.js?theme=' . $options['theme'] . '&startofweek=' . $options['startofweek'] . '&popupcalendar=' . $options['popup-calendar'], "dhtmlxcalendar" );
 	wp_enqueue_script( 'schedulepostscalendar' );
@@ -90,11 +93,11 @@ function schedule_posts_calendar()
  	This function is called to add the .css and .js files to the WordPress list pages.
  	It's registered at the end of the file with an add_action() call.
 */
-function schedule_posts_calendar_quick_schedule() 
+function schedule_posts_calendar_quick_schedule()
 	{
 	// Find out where our plugin is stored.
 	$plugin_url = plugins_url( '', __FILE__ );
-	
+
 	// Retrieve the options.
 	$options = get_option( 'schedule_posts_calendar' );
 
@@ -110,7 +113,7 @@ function schedule_posts_calendar_checked_state( $value, $key )
 	{
 	if( array_key_exists( $key, $value ) )
 		{
-		if( $value[$key] == 1 ) 
+		if( $value[$key] == 1 )
 			{
 			return 1;
 			}
@@ -118,7 +121,7 @@ function schedule_posts_calendar_checked_state( $value, $key )
 
 	return 0;
 	}
-	
+
 /*
  	This function is called when you select the admin page for the plugin, it generates the HTML
  	and is responsible to store the settings.
@@ -142,7 +145,7 @@ function schedule_posts_calendar_admin_page()
 			if( empty( $_POST['schedule_posts_calendar']['FMN'.$month] ) ) { $_POST['schedule_posts_calendar']['FMN'.$month] = __( $month ); }
 			if( empty( $_POST['schedule_posts_calendar']['SMN'.$month] ) ) { $_POST['schedule_posts_calendar']['SMN'.$month] = __( date( "M", strtotime( $month ) ) ); }
 			}
-		
+
 		foreach( $daysoftheweek as $day )
 			{
 			if( empty( $_POST['schedule_posts_calendar']['FDN'.$day] ) ) { $_POST['schedule_posts_calendar']['FDN'.$day] = __( $day ); }
@@ -153,13 +156,16 @@ function schedule_posts_calendar_admin_page()
 		if( empty( $_POST['schedule_posts_calendar']['OK'] ) ) { $_POST['schedule_posts_calendar']['Ok'] = __("OK"); }
 		if( empty( $_POST['schedule_posts_calendar']['Today'] ) ) { $_POST['schedule_posts_calendar']['Today'] = __("Today"); }
 		if( empty( $_POST['schedule_posts_calendar']['Update'] ) ) { $_POST['schedule_posts_calendar']['Update'] = __("Update"); }
-			
+
 		update_option( 'schedule_posts_calendar', $_POST['schedule_posts_calendar'] );
-		
+
 		print "<div id='setting-error-settings_updated' class='updated settings-error'><p><strong>Settings saved.</strong></p></div>\n";
 		}
 
 	$options = get_option( 'schedule_posts_calendar' );
+
+	// If the options haven't been set yet, make sure to setup an empty array for them.
+	if( !is_array( $options ) ) { $options = array(); }
 
 	if( !array_key_exists( 'startofweek', $options ) ) { $options['startofweek'] = 7; }
 	if( !array_key_exists( 'theme', $options ) ) { $options['theme'] = 4; }
@@ -173,7 +179,7 @@ function schedule_posts_calendar_admin_page()
 		if( !array_key_exists( 'FMN'.$month, $options ) ) { $options['FMN'.$month] = __( $month ); }
 		if( !array_key_exists( 'SMN'.$month, $options ) ) { $options['SMN'.$month] = __( $month ); }
 		}
-	
+
 	foreach( $daysoftheweek as $day )
 		{
 		if( !array_key_exists( 'FDN'.$day, $options ) ) { $options['FDN'.$day] = __( $day ); }
@@ -189,7 +195,7 @@ function schedule_posts_calendar_admin_page()
 	?>
 <div class="wrap">
 	<form method="post">
-	
+
 	<fieldset style="border:1px solid #cecece;padding:15px; margin-top:25px" >
 		<legend><span style="font-size: 24px; font-weight: 700;">&nbsp;Schedule Posts Calendar Options&nbsp;</span></legend>
 		<div><?php _e('Start week on');?>: <Select name="schedule_posts_calendar[startofweek]">
@@ -204,12 +210,12 @@ function schedule_posts_calendar_admin_page()
 		</select></div>
 
 		<div>&nbsp;</div>
-		
+
 		<div><?php _e('Calendar theme');?>: <Select name="schedule_posts_calendar[theme]">
 <?php
-		$themes = array( "WordPress", "Sky Blue", "Web", "Terrace" );
-		
-		for( $i = 0; $i < 4; $i++ )
+		$themes = array( "WordPress", "Sky Blue", "Web", "Terrace", "Material" );
+
+		for( $i = 0; $i < count( $themes ); $i++ )
 			{
 			echo "			<option value=" . ($i + 1);
 			if( $options['theme'] == $i + 1 ) { echo " SELECTED"; }
@@ -219,23 +225,23 @@ function schedule_posts_calendar_admin_page()
 		</select></div>
 
 		<div>&nbsp;</div>
-		
+
 		<div><input name="schedule_posts_calendar[hide-timestamp]" type="checkbox" value="1" <?php checked($options['hide-timestamp'], 1); ?> /> <?php _e("Hide WordPress's default time stamp display"); ?></div>
 
 			<div>&nbsp;</div>
-			
+
 			<div><input name="schedule_posts_calendar[popup-calendar]" type="checkbox" value="1" <?php checked($options['popup-calendar'], 1); ?> /> <?php _e("Use a popup calendar instead of an inline one (you probably want to hide the default dispaly above)"); ?></div>
 
 			<div class="submit"><input type="submit" name="info_update" class="button-primary" value="<?php _e('Update Options') ?>" /></div>
-			
+
 	</fieldset>
-		
+
 	<fieldset style="border:1px solid #cecece;padding:15px; margin-top:25px" >
 		<legend><span style="font-size: 24px; font-weight: 700;">&nbsp;Translation Options&nbsp;</span></legend>
 		<div><input name="schedule_posts_calendar[enable-translation]" type="checkbox" value="1" <?php checked($options['enable-translation'], 1); ?> /> <?php _e('Enable translation');?></div>
 
 		<div>&nbsp;</div>
-		
+
 		<div><input name="schedule_posts_calendar[override-translation]" type="checkbox" value="1" <?php checked($options['override-translation'], 1); ?> /> <?php _e('Override translation with the following values:');?></div>
 
 		<div>&nbsp;</div>
@@ -252,7 +258,7 @@ function schedule_posts_calendar_admin_page()
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cancel
 				</td>
 				<td>
-					= 
+					=
 				</td>
 				<td>
 					<input name="schedule_posts_calendar[Cancel]" type="text" value="<?php echo $options['Cancel']?>" size=10>
@@ -261,7 +267,7 @@ function schedule_posts_calendar_admin_page()
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OK
 				</td>
 				<td>
-					= 
+					=
 				</td>
 				<td>
 					<input name="schedule_posts_calendar[OK]" type="text" value="<?php echo $options['OK']?>" size=10>
@@ -273,7 +279,7 @@ function schedule_posts_calendar_admin_page()
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Today
 				</td>
 				<td>
-					= 
+					=
 				</td>
 				<td>
 					<input name="schedule_posts_calendar[Today]" type="text" value="<?php echo $options['Today']?>" size=10>
@@ -282,14 +288,14 @@ function schedule_posts_calendar_admin_page()
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Update
 				</td>
 				<td>
-					= 
+					=
 				</td>
 				<td>
 					<input name="schedule_posts_calendar[Update]" type="text" value="<?php echo $options['Update']?>" size=10>
 				</td>
 			</tr>
 
-			
+
 			<tr>
 				<td colspan=6>
 					&nbsp;
@@ -305,7 +311,7 @@ function schedule_posts_calendar_admin_page()
 				</td>
 			</tr>
 
-			<?php 
+			<?php
 			foreach( $monthsoftheyear as $month )
 				{
 				echo '<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . __( $month ) .'</td><td> = </td><td><input name="schedule_posts_calendar[FMN' . $month . ']" type="text" value="' . $options['FMN'.$month] . '" size=10></td>';
@@ -328,8 +334,8 @@ function schedule_posts_calendar_admin_page()
 					<b><?php _e('Short Day Names')?>:</b>
 				</td>
 			</tr>
-			
-			<?php 
+
+			<?php
 			foreach( $daysoftheweek as $day )
 				{
 				echo '<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . __( $day ) .'</td><td> = </td><td><input name="schedule_posts_calendar[FDN' . $day . ']" type="text" value="' . $options['FDN' . $day] . '" size=10></td>';
@@ -337,11 +343,11 @@ function schedule_posts_calendar_admin_page()
 				}
 			?>
 		</table>
-		
+
 		<div class="submit"><input type="submit" name="info_update" class="button-primary" value="<?php _e('Update Options') ?>" /></div>
-		
+
 	</fieldset>
-	
+
 	</form>
 
 	<fieldset style="border:1px solid #cecece;padding:15px; margin-top:25px" >
@@ -350,7 +356,7 @@ function schedule_posts_calendar_admin_page()
 			<p>by Greg Ross</p>
 			<p>&nbsp;</p>
 			<p>Licenced under the <a href="http://www.gnu.org/licenses/gpl-2.0.html" target=_blank>GPL Version 2</a></p>
-			<p>To find out more, please visit the <a href='http://wordpress.org/plugins/schedule-posts-calendar/' target=_blank>WordPress Plugin Directory page</a> or the plugin home page on <a href='http://toolstack.com/schedule-posts-calendar' target=_blank>ToolStack.com</a></p> 
+			<p>To find out more, please visit the <a href='http://wordpress.org/plugins/schedule-posts-calendar/' target=_blank>WordPress Plugin Directory page</a> or the plugin home page on <a href='http://toolstack.com/schedule-posts-calendar' target=_blank>ToolStack.com</a></p>
 			<p>&nbsp;</p>
 			<p>Don't forget to <a href='http://wordpress.org/support/view/plugin-reviews/schedule-posts-calendar' target=_blank>rate and review</a> it too!</p>
 	</fieldset>
@@ -358,7 +364,7 @@ function schedule_posts_calendar_admin_page()
 	<?php
 	//***** End HTML
 	}
-	
+
 /*
  	This function is called to check if we need to add the above .css and .js files
  	on this page.  ONLY the posts pages need to include the files, all other admin pages
@@ -372,7 +378,7 @@ function SCP_Add_Calendar_Includes()
 		{
 		// Grab the lower case base name of the script file.
 		$pagename = strtolower(basename($_SERVER['SCRIPT_NAME'], ".php"));
-		
+
 		// There are only two pages we really need to include the files on, so
 		// use a switch to make it easier for later if we need to add more page
 		// names to the list.
@@ -396,32 +402,32 @@ function SCP_Add_Calendar_Includes()
 /*
  	This function is called to add the options page to the settings menu.
  	It's registered at the end of the file with an add_action() call.
-*/	
+*/
 function schedule_posts_calendar_admin()
 	{
 	add_options_page( 'Schedule Posts Calendar', 'Schedule Posts Calendar', 'manage_options', basename( __FILE__ ), 'schedule_posts_calendar_admin_page');
-	}	
+	}
 
 /*
    Add the link to action list for post_row_actions.
 */
-function schedule_posts_calendar_link_row($actions, $post) 
+function schedule_posts_calendar_link_row($actions, $post)
 	{
 	$actions['schedule'] = '<a href="#" class="editinlineschedule" title="Schedule this item" onClick="scp_calendar_quick_schedule_edit(' . $post->ID . ');">' . __('Schedule') . '</a>';
-		
+
 	return $actions;
 	}
 
 /*
    Add the link to settings from the plugin list.
 */
-function schedule_posts_calendar_plugin_actions( $actions, $plugin_file, $plugin_data, $context ) 
+function schedule_posts_calendar_plugin_actions( $actions, $plugin_file, $plugin_data, $context )
 	{
 	array_unshift( $actions, '<a href="' . admin_url() . 'options-general.php?page=schedule-posts-calendar.php">' . __('Settings') . '</a>' );
-	
+
 	return $actions;
 	}
-	
+
 /*
 	Add a function that the JavaScript code can use to retrieve translation information for.
 */
@@ -433,7 +439,7 @@ function schedule_posts_calendar_lang()
 	// If the 'enable-translation' option hasn't been set yet, for example if the settings
 	// haven't been saved since the upgrade, assume translations should be enabled.
 	if( !isset( $options['enable-translation'] ) ) { $options['enable-translation'] = 1; }
-	
+
 	// We're outputting the script no matter what (so we don't have to check for the function's
 	// existence in the JavaScript code, so setup the first part of it.
 	// Note we make it a function for two reasons:
@@ -442,7 +448,7 @@ function schedule_posts_calendar_lang()
 	//        added yet so the object definition isn't available to use.
 	echo '<script type="text/javascript">' . "\n";
 	echo 'function SchedulePostsCalenderLang() {' . "\n";
-	
+
 	// Check to see if translation is enabled
 	if( $options['enable-translation'] == 1 )
 		{
@@ -477,22 +483,22 @@ function schedule_posts_calendar_lang()
 		// misc. strings for us to use.
 		echo '    var langs = { Today:"Today", Cancel:"Cancel", Update:"Update", OK:"OK"};' . "\n";
 		}
-		
+
 	// Finish off the function and close the script.
 	echo '    return langs;' . "\n";
 	echo '    }' . "\n";
 	echo '</script>' . "\n";
 	}
-	
+
 // Time to register the .css and .js pages, if we need to of course ;)
 
 // First find out if we're in a post/page list, in a post/page edit page or somewhere we don't care about.
 $fname = SCP_Add_Calendar_Includes();
 
 // If we're somewhere we care about, do the admin_init action.
-if( $fname <> "" ) 
+if( $fname <> "" )
 	{
-	add_action( 'admin_init', $fname ); 
+	add_action( 'admin_init', $fname );
 
 	add_action('admin_print_scripts', 'schedule_posts_calendar_lang' );
 	}
@@ -502,14 +508,14 @@ if( $fname == "schedule_posts_calendar_quick_schedule" )
 {
 	add_filter('post_row_actions', 'schedule_posts_calendar_link_row',10,2);
 	add_filter('page_row_actions', 'schedule_posts_calendar_link_row',10,2);
-	
+
 	add_action('admin_print_scripts', 'schedule_posts_calendar_lang' );
 }
 
 // Now add the admin menu items
-if ( is_admin() ) 
-	{ 
-	add_action( 'admin_menu', 'schedule_posts_calendar_admin', 1 ); 
+if ( is_admin() )
+	{
+	add_action( 'admin_menu', 'schedule_posts_calendar_admin', 1 );
 	add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'schedule_posts_calendar_plugin_actions', 10, 4);
 	}
 

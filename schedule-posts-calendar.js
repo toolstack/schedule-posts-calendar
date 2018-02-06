@@ -5,13 +5,13 @@ var SchedulePostsCalendar = null;
 
 /*
 	This function returns the index of specific JavaScript file we're looking for.
-	
+
 	name = the file name of the script to look for
 */
 function scp_get_script_index(name)
 {
 	// Loop through all the scripts in the current document to find the one we want.
-	for( i = 0; i < document.scripts.length; i++) 
+	for( i = 0; i < document.scripts.length; i++)
 		{
 		// Make a temporary copy of the URI and find out where the query string starts.
 		var tmp_src = String(document.scripts[i].src);
@@ -23,7 +23,7 @@ function scp_get_script_index(name)
 			return i;
 			}
 		}
-		
+
 	return -1;
 }
 
@@ -110,10 +110,10 @@ function scp_calendar_today()
 function scp_copy_admin_theme() {
 	var background = jQuery('.wp-has-current-submenu .wp-menu-open' ).css("background-color");
 	var foreground = jQuery('.wp-has-current-submenu .wp-menu-open' ).css("color");
-	
+
 	var style = document.createElement('style');
 	style.type = 'text/css';
-	style.innerHTML = '.dhtmlxcalendar_wordpress div.dhtmlxcalendar_dates_cont ul.dhtmlxcalendar_line li.dhtmlxcalendar_cell.dhtmlxcalendar_cell_month_date { color: ' + foreground + '; background-color: ' + background + ' !important; }' 
+	style.innerHTML = '.dhtmlxcalendar_wordpress div.dhtmlxcalendar_dates_cont ul.dhtmlxcalendar_line li.dhtmlxcalendar_cell.dhtmlxcalendar_cell_month_date { color: ' + foreground + '; background-color: ' + background + ' !important; }'
 					+ '.dhtmlxcalendar_wordpress div.dhtmlxcalendar_dates_cont ul.dhtmlxcalendar_line li.dhtmlxcalendar_cell.dhtmlxcalendar_cell_month_date_hover { color: ' + foreground + '; background-color: ' + background + ' !important; }'
 					+ '.dhtmlxcalendar_wordpress div.dhtmlxcalendar_dates_cont ul.dhtmlxcalendar_line li.dhtmlxcalendar_cell.dhtmlxcalendar_cell_hover { color: ' + foreground + '; background-color: ' + background + ' !important; }'
 					+ '.dhtmlxcalendar_wordpress div.dhtmlxcalendar_dates_cont ul.dhtmlxcalendar_line li.dhtmlxcalendar_cell.dhtmlxcalendar_cell_weekend_hover { color: ' + foreground + '; background-color: ' + background + ' !important; }'
@@ -124,11 +124,11 @@ function scp_copy_admin_theme() {
 					+ '.dhtmlxcalendar_wordpress div.dhtmlxcalendar_days_cont ul.dhtmlxcalendar_line li.dhtmlxcalendar_cell.dhtmlxcalendar_day_weekday_cell_first { color: ' + background + ' !important; }'
 					+ '.dhtmlxcalendar_wordpress div.dhtmlxcalendar_selector_obj table.dhtmlxcalendar_selector_table td.dhtmlxcalendar_selector_cell_middle ul li.dhtmlxcalendar_selector_cell_active, .dhtmlxcalendar_wordpress div.dhtmlxcalendar_selector_obj table.dhtmlxcalendar_selector_table td.dhtmlxcalendar_selector_cell_middle ul li.dhtmlxcalendar_selector_cell_hover { color: ' + foreground + '; background-color: ' + background + ' !important; }'
 					;
-	
-	
+
+
 	document.getElementsByTagName('head')[0].appendChild(style);
 }
-	
+
 /*
 	This function adds the JavaScript calendar to the html elements on the post/pages page.
 */
@@ -139,17 +139,17 @@ function scp_add_calendar()
 
 	// Find the timesteampdiv <div> in the current page.
 	var parent = document.getElementById('timestampdiv');
-	
+
 	// Clean up the Cancel "button", make it a real button and align it to the right .
 	jQuery('.cancel-timestamp').addClass('button').css('margin-left','30px');
 
 	jQuery('.save-timestamp').css('float','left');
-	
+
 	// Create the today button.
 	todayButton = '<a accesskey="t" href="#" title="' + langs["Today"] + '" class="button-secondary alignleft" onclick="scp_calendar_today()" style="margin-left:30px">' + langs["Today"] + '</a>';
-	
+
 	jQuery( todayButton ).insertBefore('.cancel-timestamp');
-	
+
 	// If we didn't find the parent, don't bother doing anything else.
 	if( parent )
 		{
@@ -160,9 +160,13 @@ function scp_add_calendar()
 		var popupCalendar = scp_get_script_variable(GSI, 'popupcalendar', 0);
 		var theme = '';
 		var calheight = '250px';
-		
+
 		switch( themenumber )
 			{
+			case '5':
+				theme = 'material';
+				calheight = '300px';
+				break;
 			case '4':
 				theme = 'dhx_terrace';
 				calheight = '300px';
@@ -195,8 +199,8 @@ function scp_add_calendar()
 			elmnt.setAttribute('id', 'calendarHere');
 			elmnt.setAttribute('type', 'text');
 			}
-		
-		// Insert the div we just created in to the current page as the first child under 'timestampdiv'. 
+
+		// Insert the div we just created in to the current page as the first child under 'timestampdiv'.
 		parent.insertBefore(elmnt,parent.firstChild);
 
 		// Get the current date/time from the form.
@@ -205,21 +209,23 @@ function scp_add_calendar()
 		var sYear = new String(document.getElementById('aa').value);
 		var sHour = new String(document.getElementById('hh').value);
 		var sMin = new String(document.getElementById('mn').value);
-		
+
 		// Setup a date object to use to set the initial calendar date to display from the values in the WordPress controls.
+		// NOTE: Make sure to set the date in reverse order (aka year, month, day) otherwise the value may wrap to the next month
+		// if the current month has less days than the target month.
 		var startingDate = new Date();
-		startingDate.setDate(sDay);
-		startingDate.setMonth(sMon);
-		startingDate.setFullYear(sYear);
-		startingDate.setHours(sHour);
-		startingDate.setMinutes(sMin);
+		startingDate.setFullYear(parseInt(sYear));
+		startingDate.setMonth(parseInt(sMon));
+		startingDate.setDate(parseInt(sDay));
+		startingDate.setHours(parseInt(sHour));
+		startingDate.setMinutes(parseInt(sMin));
 
 		// If we're replacing the stock WP fields, set the new field's starting date.  Make sure the formatting looks right with 0 padded day/mon/hour/minute fields.
 		if( popupCalendar == 1 )
 			{
 			// The index returned is 0 based but we need it to be 1 based to create the string.
 			sMon = new String(document.getElementById('mm').selectedIndex + 1);
-			
+
 			var dateString = '';
 			if( sDay.length < 2 ) { dateString += '0'; }
 			dateString += sDay + '/';
@@ -248,11 +254,11 @@ function scp_add_calendar()
 
 		// Only show the calendar if its inline
 		if( popupCalendar == 0 ) { SchedulePostsCalendar.show(); }
-		
+
 		if( theme == 'wordpress' ) {
 			scp_copy_admin_theme();
 		}
-		
+
 		// We have to attach two events to the calendar to catch when the user clicks on a new date or time.  They both do the exactly same thing, but the first catches the date change and the second the time change.
 		var myEvent = SchedulePostsCalendar.attachEvent("onClick", function (selectedDate){
 				document.getElementById('mm').selectedIndex = selectedDate.getMonth();
