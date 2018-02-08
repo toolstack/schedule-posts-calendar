@@ -4,8 +4,8 @@ Plugin URI: http://toolstack.com/schedulepostscalendar
 Author URI: http://toolstack.com
 Tags: admin, posts, calendar
 Requires at least: 3.0.0
-Tested up to: 4.8
-Stable tag: 5.1
+Tested up to: 4.9
+Stable tag: 5.2
 
 Adds a JavaScript calendar to the scheduled publish widget to allow you to select a date and time graphically instead of via the text entry boxes.
 
@@ -44,7 +44,7 @@ If you are using IE in compatibility mode the calendar will overlap other areas,
 
 == Changelog ==
 = 5.2 =
-* Release date: TBD
+* Release date: February 8, 2018
 * Updated calendar code to v5.1.
 * Fixed bug where post dates at the end of a month would wrap if the current month had lest days in it.
 * Fixed PHP warning if the options had not yet been saved.
@@ -133,7 +133,7 @@ If you are using IE in compatibility mode the calendar will overlap other areas,
 * Initial release.
 
 == Upgrade Notice ==
-= 5.1 =
+= 5.2 =
 None.
 
 == Roadmap ==

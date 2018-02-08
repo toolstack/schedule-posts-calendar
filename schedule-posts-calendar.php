@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Schedule Posts Calendar
-Version: 5.1
+Version: 5.2
 Plugin URI: http://toolstack.com/SchedulePostsCalendar
 Author: Greg Ross
 Author URI: http://toolstack.com
@@ -16,7 +16,7 @@ Copyright (c) 2012-15 by Greg Ross
 This software is released under the GPL v2.0, see license.txt for details
 */
 
-define( 'SCHEDULEPOSTCALENDARVERSION', '5.1' );
+define( 'SCHEDULEPOSTCALENDARVERSION', '5.2' );
 
 /*
  	This function is called to add the .css and .js files for the calendar to
