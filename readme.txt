@@ -4,8 +4,8 @@ Plugin URI: http://toolstack.com/schedulepostscalendar
 Author URI: http://toolstack.com
 Tags: admin, posts, calendar
 Requires at least: 3.0.0
-Tested up to: 6.1.1
-Stable tag: 5.2
+Tested up to: 6.3
+Stable tag: 5.3
 
 Adds a JavaScript calendar to the scheduled publish widget to allow you to select a date and time graphically instead of via the text entry boxes.
 
@@ -43,6 +43,11 @@ If you are using IE in compatibility mode the calendar will overlap other areas,
 7. The schedule mode in the posts/pages list.
 
 == Changelog ==
+= 5.3 =
+* Release date: August 22, 2023
+* Fixed medium severity security issues.
+* Added full translation support.
+
 = 5.2 =
 * Release date: February 8, 2018
 * Updated calendar code to v5.1.
@@ -138,5 +143,3 @@ None.
 
 == Roadmap ==
 * None at this time.
-
-
