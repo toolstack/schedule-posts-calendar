@@ -1,22 +1,23 @@
 <?php
 /*
 Plugin Name: Schedule Posts Calendar
-Version: 5.2
+Version: 5.3
 Plugin URI: http://toolstack.com/SchedulePostsCalendar
 Author: Greg Ross
 Author URI: http://toolstack.com
+Text Domain: schedule-posts-calendar
 Description: Adds a JavaScript calendar to the schedule posts options.
 
 Compatible with WordPress 3+.
 
 Read the accompanying readme.txt file for instructions and documentation.
 
-Copyright (c) 2012-15 by Greg Ross
+Copyright (c) 2012-23 by Greg Ross
 
 This software is released under the GPL v2.0, see license.txt for details
 */
 
-define( 'SCHEDULEPOSTCALENDARVERSION', '5.2' );
+define( 'SCHEDULEPOSTCALENDARVERSION', '5.3' );
 
 /*
  	This function is called to add the .css and .js files for the calendar to
@@ -128,36 +129,45 @@ function schedule_posts_calendar_checked_state( $value, $key )
 */
 function schedule_posts_calendar_admin_page()
 	{
-	$daysoftheweek = array( "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" );
-	$monthsoftheyear = array( "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" );
+	$daysoftheweek = array( 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday' );
+	$monthsoftheyear = array( 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' );
+
+	$translatedDOTW = array( 'Monday' => __( 'Monday', 'schedule-posts-calendar' ), 'Tuesday' => __( 'Tuesday', 'schedule-posts-calendar' ), 'Wednesday' => __( 'Wednesday', 'schedule-posts-calendar' ), 'Thursday' => __( 'Thursday', 'schedule-posts-calendar' ), 'Friday' => __( 'Friday', 'schedule-posts-calendar' ), 'Saturday' => __( 'Saturday', 'schedule-posts-calendar' ), 'Sunday' => __( 'Sunday', 'schedule-posts-calendar' ) );
+	$translatedMOTY = array( 'January' => __( 'January', 'schedule-posts-calendar' ), 'February' => __( 'February', 'schedule-posts-calendar' ), 'March' => __( 'March', 'schedule-posts-calendar' ), 'April' => __( 'April', 'schedule-posts-calendar' ), 'May' => __( 'May', 'schedule-posts-calendar' ), 'June' => __( 'June', 'schedule-posts-calendar' ), 'July' => __( 'July', 'schedule-posts-calendar' ), 'August' => __( 'August', 'schedule-posts-calendar' ), 'September' => __( 'September', 'schedule-posts-calendar' ), 'October' => __( 'October', 'schedule-posts-calendar' ), 'November' => __( 'November', 'schedule-posts-calendar' ), 'December' => __( 'December', 'schedule-posts-calendar' ) );
+
 
 	if( array_key_exists( 'schedule_posts_calendar', $_POST ) )
 		{
-		if( empty( $_POST['schedule_posts_calendar']['startofweek'] ) ) { $_POST['schedule_posts_calendar']['startofweek'] = 7; }
-		if( empty( $_POST['schedule_posts_calendar']['theme'] ) ) { $_POST['schedule_posts_calendar']['theme'] = 4; }
-		$_POST['schedule_posts_calendar']['hide-timestamp'] = schedule_posts_calendar_checked_state( $_POST['schedule_posts_calendar'], 'hide-timestamp' );
-		$_POST['schedule_posts_calendar']['popup-calendar'] = schedule_posts_calendar_checked_state( $_POST['schedule_posts_calendar'], 'popup-calendar' );
-		$_POST['schedule_posts_calendar']['enable-translation'] = schedule_posts_calendar_checked_state( $_POST['schedule_posts_calendar'], 'enable-translation' );
-		$_POST['schedule_posts_calendar']['override-translation'] = schedule_posts_calendar_checked_state( $_POST['schedule_posts_calendar'], 'override-translation' );
+		// Make sure we have the nonce.
+		check_admin_referer('schedule-posts-calendar-settings');
+
+		$new_options = array( 'schedule_posts_calendar' => array() );
+
+		if( empty( $_POST['schedule_posts_calendar']['startofweek'] ) ) { $new_options['schedule_posts_calendar']['startofweek'] = 7; } else { $new_options['schedule_posts_calendar']['startofweek'] = intval( $_POST['schedule_posts_calendar']['startofweek'] ); }
+		if( empty( $_POST['schedule_posts_calendar']['theme'] ) ) { $new_options['schedule_posts_calendar']['theme'] = 4; } else { $new_options['schedule_posts_calendar']['theme'] = intval( $_POST['schedule_posts_calendar']['theme'] ); }
+		$new_options['schedule_posts_calendar']['hide-timestamp'] = schedule_posts_calendar_checked_state( $_POST['schedule_posts_calendar'], 'hide-timestamp' );
+		$new_options['schedule_posts_calendar']['popup-calendar'] = schedule_posts_calendar_checked_state( $_POST['schedule_posts_calendar'], 'popup-calendar' );
+		$new_options['schedule_posts_calendar']['enable-translation'] = schedule_posts_calendar_checked_state( $_POST['schedule_posts_calendar'], 'enable-translation' );
+		$new_options['schedule_posts_calendar']['override-translation'] = schedule_posts_calendar_checked_state( $_POST['schedule_posts_calendar'], 'override-translation' );
 
 		foreach( $monthsoftheyear as $month )
 			{
-			if( empty( $_POST['schedule_posts_calendar']['FMN'.$month] ) ) { $_POST['schedule_posts_calendar']['FMN'.$month] = __( $month ); }
-			if( empty( $_POST['schedule_posts_calendar']['SMN'.$month] ) ) { $_POST['schedule_posts_calendar']['SMN'.$month] = __( date( "M", strtotime( $month ) ) ); }
+			if( empty( $_POST['schedule_posts_calendar']['FMN'.$month] ) ) { $new_options['schedule_posts_calendar']['FMN'.$month] = $translatedMOTY[$month]; } else { $new_options['schedule_posts_calendar']['FMN'.$month] = sanitize_text_field( $_POST['schedule_posts_calendar']['FMN'.$month] ); }
+			if( empty( $_POST['schedule_posts_calendar']['SMN'.$month] ) ) { $new_options['schedule_posts_calendar']['SMN'.$month] = $translatedMOTY[$month]; } else { $new_options['schedule_posts_calendar']['SMN'.$month] = sanitize_text_field( $_POST['schedule_posts_calendar']['SMN'.$month] ); }
 			}
 
 		foreach( $daysoftheweek as $day )
 			{
-			if( empty( $_POST['schedule_posts_calendar']['FDN'.$day] ) ) { $_POST['schedule_posts_calendar']['FDN'.$day] = __( $day ); }
-			if( empty( $_POST['schedule_posts_calendar']['SDN'.$day] ) ) { $_POST['schedule_posts_calendar']['SDN'.$day] = __( date( "D", strtotime( $day ) ) ); }
+			if( empty( $_POST['schedule_posts_calendar']['FDN'.$day] ) ) { $new_options['schedule_posts_calendar']['FDN'.$day] = $translatedDOTW[$day]; } else { $new_options['schedule_posts_calendar']['FDN'.$day] = sanitize_text_field( $_POST['schedule_posts_calendar']['FDN'.$day] ); }
+			if( empty( $_POST['schedule_posts_calendar']['SDN'.$day] ) ) { $new_options['schedule_posts_calendar']['SDN'.$day] = $translatedDOTW[$day]; } else { $new_options['schedule_posts_calendar']['SDN'.$day] = sanitize_text_field( $_POST['schedule_posts_calendar']['SDN'.$day] ); }
 			}
 
-		if( empty( $_POST['schedule_posts_calendar']['Cancel'] ) ) { $_POST['schedule_posts_calendar']['Cancel'] = __("Cancel"); }
-		if( empty( $_POST['schedule_posts_calendar']['OK'] ) ) { $_POST['schedule_posts_calendar']['Ok'] = __("OK"); }
-		if( empty( $_POST['schedule_posts_calendar']['Today'] ) ) { $_POST['schedule_posts_calendar']['Today'] = __("Today"); }
-		if( empty( $_POST['schedule_posts_calendar']['Update'] ) ) { $_POST['schedule_posts_calendar']['Update'] = __("Update"); }
+		if( empty( $_POST['schedule_posts_calendar']['Cancel'] ) ) { $new_options['schedule_posts_calendar']['Cancel'] = __('Cancel', 'schedule-posts-calendar'); } else { $new_options['schedule_posts_calendar']['Cancel'] = sanitize_text_field( $_POST['schedule_posts_calendar']['Cancel'] ); }
+		if( empty( $_POST['schedule_posts_calendar']['OK'] ) ) { $new_options['schedule_posts_calendar']['Ok'] = __('OK', 'schedule-posts-calendar'); } else { $new_options['schedule_posts_calendar']['OK'] = sanitize_text_field( $_POST['schedule_posts_calendar']['OK'] ); }
+		if( empty( $_POST['schedule_posts_calendar']['Today'] ) ) { $new_options['schedule_posts_calendar']['Today'] = __('Today', 'schedule-posts-calendar'); } else { $new_options['schedule_posts_calendar']['Today'] = sanitize_text_field( $_POST['schedule_posts_calendar']['Today'] ); }
+		if( empty( $_POST['schedule_posts_calendar']['Update'] ) ) { $new_options['schedule_posts_calendar']['Update'] = __('Update', 'schedule-posts-calendar'); } else { $new_options['schedule_posts_calendar']['Update'] = sanitize_text_field( $_POST['schedule_posts_calendar']['Update'] ); }
 
-		update_option( 'schedule_posts_calendar', $_POST['schedule_posts_calendar'] );
+		update_option( 'schedule_posts_calendar', $new_options['schedule_posts_calendar'] );
 
 		print "<div id='setting-error-settings_updated' class='updated settings-error'><p><strong>Settings saved.</strong></p></div>\n";
 		}
@@ -176,29 +186,31 @@ function schedule_posts_calendar_admin_page()
 
 	foreach( $monthsoftheyear as $month )
 		{
-		if( !array_key_exists( 'FMN'.$month, $options ) ) { $options['FMN'.$month] = __( $month ); }
-		if( !array_key_exists( 'SMN'.$month, $options ) ) { $options['SMN'.$month] = __( $month ); }
+		if( !array_key_exists( 'FMN'.$month, $options ) ) { $options['FMN'.$month] = $translatedMOTY[$month]; }
+		if( !array_key_exists( 'SMN'.$month, $options ) ) { $options['SMN'.$month] = $translatedMOTY[$month]; }
 		}
 
 	foreach( $daysoftheweek as $day )
 		{
-		if( !array_key_exists( 'FDN'.$day, $options ) ) { $options['FDN'.$day] = __( $day ); }
-		if( !array_key_exists( 'SDN'.$day, $options ) ) { $options['SDN'.$day] = __( $day ); }
+		if( !array_key_exists( 'FDN'.$day, $options ) ) { $options['FDN'.$day] = $translatedDOTW[$day]; }
+		if( !array_key_exists( 'SDN'.$day, $options ) ) { $options['SDN'.$day] = $translatedDOTW[$day]; }
 		}
 
-	if( !array_key_exists( 'Cancel', $options ) ) { $options['Cancel'] = __("Cancel"); }
-	if( !array_key_exists( 'OK', $options ) ) { $options['OK'] = __("OK"); }
-	if( !array_key_exists( 'Today', $options ) ) { $options['Today'] = __("Today"); }
-	if( !array_key_exists( 'Update', $options ) ) { $options['Update'] = __("Update"); }
+	if( !array_key_exists( 'Cancel', $options ) ) { $options['Cancel'] = __('Cancel', 'schedule-posts-calendar'); }
+	if( !array_key_exists( 'OK', $options ) ) { $options['OK'] = __('OK', 'schedule-posts-calendar'); }
+	if( !array_key_exists( 'Today', $options ) ) { $options['Today'] = __('Today', 'schedule-posts-calendar'); }
+	if( !array_key_exists( 'Update', $options ) ) { $options['Update'] = __('Update', 'schedule-posts-calendar'); }
 
 	//***** Start HTML
 	?>
 <div class="wrap">
 	<form method="post">
 
+	<?php wp_nonce_field( 'schedule-posts-calendar-settings' ); // Add a nonce to the form. ?>
+
 	<fieldset style="border:1px solid #cecece;padding:15px; margin-top:25px" >
 		<legend><span style="font-size: 24px; font-weight: 700;">&nbsp;Schedule Posts Calendar Options&nbsp;</span></legend>
-		<div><?php _e('Start week on');?>: <Select name="schedule_posts_calendar[startofweek]">
+		<div><?php esc_html_e('Start week on:', 'schedule-posts-calendar');?> <Select name="schedule_posts_calendar[startofweek]">
 <?php
 		for( $i = 0; $i < 7; $i++ )
 			{
@@ -211,9 +223,9 @@ function schedule_posts_calendar_admin_page()
 
 		<div>&nbsp;</div>
 
-		<div><?php _e('Calendar theme');?>: <Select name="schedule_posts_calendar[theme]">
+		<div><?php esc_html_e('Calendar theme:', 'schedule-posts-calendar');?> <Select name="schedule_posts_calendar[theme]">
 <?php
-		$themes = array( "WordPress", "Sky Blue", "Web", "Terrace", "Material" );
+		$themes = array( 'WordPress', 'Sky Blue', 'Web', 'Terrace', 'Material' );
 
 		for( $i = 0; $i < count( $themes ); $i++ )
 			{
@@ -226,30 +238,30 @@ function schedule_posts_calendar_admin_page()
 
 		<div>&nbsp;</div>
 
-		<div><input name="schedule_posts_calendar[hide-timestamp]" type="checkbox" value="1" <?php checked($options['hide-timestamp'], 1); ?> /> <?php _e("Hide WordPress's default time stamp display"); ?></div>
+		<div><input name="schedule_posts_calendar[hide-timestamp]" type="checkbox" value="1" <?php checked($options['hide-timestamp'], 1); ?> /> <?php esc_html_e("Hide WordPress's default time stamp display", 'schedule-posts-calendar'); ?></div>
 
 			<div>&nbsp;</div>
 
-			<div><input name="schedule_posts_calendar[popup-calendar]" type="checkbox" value="1" <?php checked($options['popup-calendar'], 1); ?> /> <?php _e("Use a popup calendar instead of an inline one (you probably want to hide the default dispaly above)"); ?></div>
+			<div><input name="schedule_posts_calendar[popup-calendar]" type="checkbox" value="1" <?php checked($options['popup-calendar'], 1); ?> /> <?php esc_html_e('Use a popup calendar instead of an inline one (you probably want to hide the default display above)', 'schedule-posts-calendar'); ?></div>
 
-			<div class="submit"><input type="submit" name="info_update" class="button-primary" value="<?php _e('Update Options') ?>" /></div>
+			<div class="submit"><input type="submit" name="info_update" class="button-primary" value="<?php esc_attr_e('Update Options') ?>" /></div>
 
 	</fieldset>
 
 	<fieldset style="border:1px solid #cecece;padding:15px; margin-top:25px" >
 		<legend><span style="font-size: 24px; font-weight: 700;">&nbsp;Translation Options&nbsp;</span></legend>
-		<div><input name="schedule_posts_calendar[enable-translation]" type="checkbox" value="1" <?php checked($options['enable-translation'], 1); ?> /> <?php _e('Enable translation');?></div>
+		<div><input name="schedule_posts_calendar[enable-translation]" type="checkbox" value="1" <?php checked($options['enable-translation'], 1); ?> /> <?php esc_html_e('Enable translation', 'schedule-posts-calendar');?></div>
 
 		<div>&nbsp;</div>
 
-		<div><input name="schedule_posts_calendar[override-translation]" type="checkbox" value="1" <?php checked($options['override-translation'], 1); ?> /> <?php _e('Override translation with the following values:');?></div>
+		<div><input name="schedule_posts_calendar[override-translation]" type="checkbox" value="1" <?php checked($options['override-translation'], 1); ?> /> <?php esc_html_e('Override translation with the following values:', 'schedule-posts-calendar');?></div>
 
 		<div>&nbsp;</div>
 
 		<table>
 			<tr>
 				<td colspan=6>
-					<b><?php _e('Miscellaneous')?>:</b>
+					<b><?php esc_html_e('Miscellaneous', 'schedule-posts-calendar')?>:</b>
 				</td>
 			</tr>
 
@@ -261,7 +273,7 @@ function schedule_posts_calendar_admin_page()
 					=
 				</td>
 				<td>
-					<input name="schedule_posts_calendar[Cancel]" type="text" value="<?php echo $options['Cancel']?>" size=10>
+					<input name="schedule_posts_calendar[Cancel]" type="text" value="<?php echo esc_attr( $options['Cancel'] );?>" size=10>
 				</td>
 				<td>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OK
@@ -270,7 +282,7 @@ function schedule_posts_calendar_admin_page()
 					=
 				</td>
 				<td>
-					<input name="schedule_posts_calendar[OK]" type="text" value="<?php echo $options['OK']?>" size=10>
+					<input name="schedule_posts_calendar[OK]" type="text" value="<?php echo esc_attr( $options['OK']);?>" size=10>
 				</td>
 			</tr>
 
@@ -282,7 +294,7 @@ function schedule_posts_calendar_admin_page()
 					=
 				</td>
 				<td>
-					<input name="schedule_posts_calendar[Today]" type="text" value="<?php echo $options['Today']?>" size=10>
+					<input name="schedule_posts_calendar[Today]" type="text" value="<?php echo esc_attr( $options['Today']);?>" size=10>
 				</td>
 				<td>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Update
@@ -291,7 +303,7 @@ function schedule_posts_calendar_admin_page()
 					=
 				</td>
 				<td>
-					<input name="schedule_posts_calendar[Update]" type="text" value="<?php echo $options['Update']?>" size=10>
+					<input name="schedule_posts_calendar[Update]" type="text" value="<?php echo esc_attr( $options['Update']);?>" size=10>
 				</td>
 			</tr>
 
@@ -304,18 +316,18 @@ function schedule_posts_calendar_admin_page()
 
 			<tr>
 				<td colspan=3>
-					<b><?php _e('Full Month Names')?>:</b>
+					<b><?php esc_html_e('Full Month Names:', 'schedule-posts-calendar')?></b>
 				</td>
 				<td colspan=3>
-					<b><?php _e('Short Month Names')?>:</b>
+					<b><?php esc_html_e('Short Month Names:', 'schedule-posts-calendar')?></b>
 				</td>
 			</tr>
 
 			<?php
 			foreach( $monthsoftheyear as $month )
 				{
-				echo '<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . __( $month ) .'</td><td> = </td><td><input name="schedule_posts_calendar[FMN' . $month . ']" type="text" value="' . $options['FMN'.$month] . '" size=10></td>';
-				echo '<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . __( $month ) .'</td><td> = </td><td><input name="schedule_posts_calendar[SMN' . $month . ']" type="text" value="' . $options['SMN'.$month] . '" size=10></td></tr>';
+				echo '<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . $translatedMOTY[$month] .'</td><td> = </td><td><input name="schedule_posts_calendar[FMN' . $month . ']" type="text" value="' . esc_attr( $options['FMN'.$month] ) . '" size=10></td>';
+				echo '<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . $translatedMOTY[$month] .'</td><td> = </td><td><input name="schedule_posts_calendar[SMN' . $month . ']" type="text" value="' . esc_attr( $options['SMN'.$month] ) . '" size=10></td></tr>';
 				}
 
 			?>
@@ -328,23 +340,23 @@ function schedule_posts_calendar_admin_page()
 
 			<tr>
 				<td colspan=3>
-					<b><?php _e('Full Day Names')?>:</b>
+					<b><?php esc_html_e('Full Day Names:', 'schedule-posts-calendar')?></b>
 				</td>
 				<td colspan=3>
-					<b><?php _e('Short Day Names')?>:</b>
+					<b><?php esc_html_e('Short Day Names:', 'schedule-posts-calendar')?></b>
 				</td>
 			</tr>
 
 			<?php
 			foreach( $daysoftheweek as $day )
 				{
-				echo '<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . __( $day ) .'</td><td> = </td><td><input name="schedule_posts_calendar[FDN' . $day . ']" type="text" value="' . $options['FDN' . $day] . '" size=10></td>';
-				echo '<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . __( $day ) .'</td><td> = </td><td><input name="schedule_posts_calendar[SDN' . $day . ']" type="text" value="' . $options['SDN' . $day] . '" size=10></td></tr>';
+				echo '<tr><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . $translatedDOTW[$day] .'</td><td> = </td><td><input name="schedule_posts_calendar[FDN' . $day . ']" type="text" value="' . esc_attr( $options['FDN' . $day] ) . '" size=10></td>';
+				echo '<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . $translatedDOTW[$day] .'</td><td> = </td><td><input name="schedule_posts_calendar[SDN' . $day . ']" type="text" value="' . esc_attr( $options['SDN' . $day] ) . '" size=10></td></tr>';
 				}
 			?>
 		</table>
 
-		<div class="submit"><input type="submit" name="info_update" class="button-primary" value="<?php _e('Update Options') ?>" /></div>
+		<div class="submit"><input type="submit" name="info_update" class="button-primary" value="<?php esc_attr_e('Update Options') ?>" /></div>
 
 	</fieldset>
 
@@ -352,13 +364,13 @@ function schedule_posts_calendar_admin_page()
 
 	<fieldset style="border:1px solid #cecece;padding:15px; margin-top:25px" >
 		<legend><span style="font-size: 24px; font-weight: 700;">&nbsp;About&nbsp;</span></legend>
-			<p>Schedule Posts Calendar Version <?php echo SCHEDULEPOSTCALENDARVERSION?></p>
-			<p>by Greg Ross</p>
+			<p><?php printf( __('Schedule Posts Calendar Version %1$s','schedule-posts-calender'), SCHEDULEPOSTCALENDARVERSION );?></p>
+			<p><?php _e('by Greg Ross', 'schedule-posts-calendar');?></p>
 			<p>&nbsp;</p>
-			<p>Licenced under the <a href="http://www.gnu.org/licenses/gpl-2.0.html" target=_blank>GPL Version 2</a></p>
-			<p>To find out more, please visit the <a href='http://wordpress.org/plugins/schedule-posts-calendar/' target=_blank>WordPress Plugin Directory page</a> or the plugin home page on <a href='http://toolstack.com/schedule-posts-calendar' target=_blank>ToolStack.com</a></p>
+			<p><?php printf(__('Licenced under the %sGPL Version 2%s', 'schedule-posts-calendar'), '<a href="http://www.gnu.org/licenses/gpl-2.0.html" target=_blank>', '</a>');?></p>
+			<p><?php printf(__('To find out more, please visit the %sWordPress Plugin Directory page%s or the plugin home page on %sToolStack.com%s', 'schedule-posts-calendar'), '<a href="http://wordpress.org/plugins/schedule-posts-calendar/" target=_blank>', '</a>', '<a href="http://toolstack.com/schedule-posts-calendar" target=_blank>', '</a>');?></p>
 			<p>&nbsp;</p>
-			<p>Don't forget to <a href='http://wordpress.org/support/view/plugin-reviews/schedule-posts-calendar' target=_blank>rate and review</a> it too!</p>
+			<p><?php printf(__("Don't forget to %srate and review%s it too!", 'schedule-posts-calendar'), '<a href="http://wordpress.org/support/view/plugin-reviews/schedule-posts-calendar" target=_blank>', '</a>');?></p>
 	</fieldset>
 </div>
 	<?php
@@ -413,7 +425,7 @@ function schedule_posts_calendar_admin()
 */
 function schedule_posts_calendar_link_row($actions, $post)
 	{
-	$actions['schedule'] = '<a href="#" class="editinlineschedule" title="Schedule this item" onClick="scp_calendar_quick_schedule_edit(' . $post->ID . ');">' . __('Schedule') . '</a>';
+	$actions['schedule'] = '<a href="#" class="editinlineschedule" title="Schedule this item" onClick="scp_calendar_quick_schedule_edit(' . $post->ID . ');">' . __('Schedule', 'schedule-posts-calendar') . '</a>';
 
 	return $actions;
 	}
@@ -423,7 +435,7 @@ function schedule_posts_calendar_link_row($actions, $post)
 */
 function schedule_posts_calendar_plugin_actions( $actions, $plugin_file, $plugin_data, $context )
 	{
-	array_unshift( $actions, '<a href="' . admin_url() . 'options-general.php?page=schedule-posts-calendar.php">' . __('Settings') . '</a>' );
+	array_unshift( $actions, '<a href="' . admin_url() . 'options-general.php?page=schedule-posts-calendar.php">' . __('Settings', 'schedule-posts-calendar') . '</a>' );
 
 	return $actions;
 	}
@@ -459,22 +471,22 @@ function schedule_posts_calendar_lang()
 		if( array_key_exists( 'override-translation', $options ) && $options['override-translation'] == 1 )
 			{
 			// Overriding may be useful if the WordPress functions don't return 'good' translations.
-			echo '        monthesFNames: ["' . $options['FMNJanuary'] . '","' . $options['FMNFebruary'] . '","' . $options['FMNMarch'] . '","' . $options['FMNApril'] . '","' . $options['FMNMay'] . '","' . $options['FMNJune'] . '","' . $options['FMNJuly'] . '","' . $options['FMNAugust'] . '","' . $options['FMNSeptember'] . '","' . $options['FMNOctober'] . '","' . $options['FMNNovember'] . '","' . $options['FMNDecember'] . '"],' . "\n";
-			echo '        monthesSNames: ["' . $options['SMNJanuary'] . '","' . $options['SMNFebruary'] . '","' . $options['SMNMarch'] . '","' . $options['SMNApril'] . '","' . $options['SMNMay'] . '","' . $options['SMNJune'] . '","' . $options['SMNJuly'] . '","' . $options['SMNAugust'] . '","' . $options['SMNSeptember'] . '","' . $options['SMNOctober'] . '","' . $options['SMNNovember'] . '","' . $options['SMNDecember'] . '"],' . "\n";
-			echo '        daysFNames: ["' . $options['FDNSunday'] . '","' . $options['FDNMonday'] . '","' . $options['FDNTuesday'] . '","' . $options['FDNWednesday'] . '","' . $options['FDNThursday'] . '","' . $options['FDNFriday'] . '","' . $options['FDNSaturday'] . '"],' . "\n";
-			echo '        daysSNames: ["' . $options['SDNSunday'] . '","' . $options['SDNMonday'] . '","' . $options['SDNTuesday'] . '","' . $options['SDNWednesday'] . '","' . $options['SDNThursday'] . '","' . $options['SDNFriday'] . '","' . $options['SDNSaturday'] . '"],' . "\n";
+			echo '        monthesFNames: ["' . esc_html( $options['FMNJanuary'] ) . '","' . esc_html( $options['FMNFebruary'] ) . '","' . esc_html( $options['FMNMarch'] ) . '","' . esc_html( $options['FMNApril'] ) . '","' . esc_html( $options['FMNMay'] ) . '","' . esc_html( $options['FMNJune'] . '","' ) . esc_html( $options['FMNJuly'] ) . '","' . esc_html( $options['FMNAugust'] ) . '","' . esc_html( $options['FMNSeptember'] ) . '","' . esc_html( $options['FMNOctober'] ) . '","' . esc_html( $options['FMNNovember'] ) . '","' . esc_html( $options['FMNDecember'] ) . '"],' . "\n";
+			echo '        monthesSNames: ["' . esc_html( $options['SMNJanuary'] ) . '","' . esc_html( $options['SMNFebruary'] ) . '","' . esc_html( $options['SMNMarch'] ) . '","' . esc_html( $options['SMNApril'] ) . '","' . esc_html( $options['SMNMay'] ) . '","' . esc_html( $options['SMNJune'] ) . '","' . esc_html( $options['SMNJuly'] ) . '","' . esc_html( $options['SMNAugust'] ) . '","' . esc_html( $options['SMNSeptember'] ) . '","' . esc_html( $options['SMNOctober'] ) . '","' . esc_html( $options['SMNNovember'] ) . '","' . esc_html( $options['SMNDecember'] ) . '"],' . "\n";
+			echo '        daysFNames: ["' . esc_html( $options['FDNSunday'] ) . '","' . esc_html( $options['FDNMonday'] ) . '","' . esc_html( $options['FDNTuesday'] ) . '","' . esc_html( $options['FDNWednesday'] ) . '","' . esc_html( $options['FDNThursday'] ) . '","' . esc_html( $options['FDNFriday'] ) . '","' . esc_html( $options['FDNSaturday'] ) . '"],' . "\n";
+			echo '        daysSNames: ["' . esc_html( $options['SDNSunday'] ) . '","' . esc_html( $options['SDNMonday'] ) . '","' . esc_html( $options['SDNTuesday'] ) . '","' . esc_html( $options['SDNWednesday'] ) . '","' . esc_html( $options['SDNThursday'] ) . '","' . esc_html( $options['SDNFriday'] ) . '","' . esc_html( $options['SDNSaturday'] ) . '"],' . "\n";
 			echo '        };' . "\n";
-			echo '    var langs = { Today:"' . $options["Today"] . '", Cancel:"' . $options["Cancel"] . '", Update:"' . $options["Update"] . '", OK:"' . $options["OK"] . '"};' . "\n";
+			echo '    var langs = { Today:"' . esc_html( $options["Today"] ) . '", Cancel:"' . esc_html( $options["Cancel"] ) . '", Update:"' . esc_html( $options["Update"] ) . '", OK:"' . esc_html( $options["OK"] ) . '"};' . "\n";
 			}
 		else
 			{
 			// Of course, WordPress is probably fine so just use it.
-			echo '        monthesFNames: ["' . __("January") . '","' . __("February") . '","' . __("March") . '","' . __("April") . '","' . __("May") . '","' . __("June") . '","' . __("July") . '","' . __("August") . '","' . __("September") . '","' . __("October") . '","' . __("November") . '","' . __("December") . '"],' . "\n";
-			echo '        monthesSNames: ["' . __("Jan") . '","' . __("Feb") . '","' . __("Mar") . '","' . __("Apr") . '","' . __("May") . '","' . __("Jun") . '","' . __("Jul") . '","' . __("Aug") . '","' . __("Sep") . '","' . __("Oct") . '","' . __("Nov") . '","' . __("Dec") . '"],' . "\n";
-			echo '        daysFNames: ["' . __("Sunday") . '","' . __("Monday") . '","' . __("Tuesday") . '","' . __("Wednesday") . '","' . __("Thursday") . '","' . __("Friday") . '","' . __("Saturday") . '"],' . "\n";
-			echo '        daysSNames: ["' . __("Sun") . '","' . __("Mon") . '","' . __("Tue") . '","' . __("Wed") . '","' . __("Thu") . '","' . __("Fri") . '","' . __("Sat") . '"]' . "\n";
+			echo '        monthesFNames: ["' . __('January', 'schedule-posts-calendar') . '","' . __('February', 'schedule-posts-calendar') . '","' . __('March', 'schedule-posts-calendar') . '","' . __('April', 'schedule-posts-calendar') . '","' . __('May', 'schedule-posts-calendar') . '","' . __('June', 'schedule-posts-calendar') . '","' . __('July', 'schedule-posts-calendar') . '","' . __('August', 'schedule-posts-calendar') . '","' . __('September', 'schedule-posts-calendar') . '","' . __('October', 'schedule-posts-calendar') . '","' . __('November', 'schedule-posts-calendar') . '","' . __('December', 'schedule-posts-calendar') . '"],' . "\n";
+			echo '        monthesSNames: ["' . __('Jan', 'schedule-posts-calendar') . '","' . __('Feb', 'schedule-posts-calendar') . '","' . __('Mar', 'schedule-posts-calendar') . '","' . __('Apr', 'schedule-posts-calendar') . '","' . __('May', 'schedule-posts-calendar') . '","' . __('Jun', 'schedule-posts-calendar') . '","' . __('Jul', 'schedule-posts-calendar') . '","' . __('Aug', 'schedule-posts-calendar') . '","' . __('Sep', 'schedule-posts-calendar') . '","' . __('Oct', 'schedule-posts-calendar') . '","' . __('Nov', 'schedule-posts-calendar') . '","' . __('Dec', 'schedule-posts-calendar') . '"],' . "\n";
+			echo '        daysFNames: ["' . __('Sunday', 'schedule-posts-calendar') . '","' . __('Monday', 'schedule-posts-calendar') . '","' . __('Tuesday', 'schedule-posts-calendar') . '","' . __('Wednesday', 'schedule-posts-calendar') . '","' . __('Thursday', 'schedule-posts-calendar') . '","' . __('Friday', 'schedule-posts-calendar') . '","' . __('Saturday', 'schedule-posts-calendar') . '"],' . "\n";
+			echo '        daysSNames: ["' . __('Sun', 'schedule-posts-calendar') . '","' . __('Mon', 'schedule-posts-calendar') . '","' . __('Tue', 'schedule-posts-calendar') . '","' . __('Wed', 'schedule-posts-calendar') . '","' . __('Thu', 'schedule-posts-calendar') . '","' . __('Fri', 'schedule-posts-calendar') . '","' . __('Sat', 'schedule-posts-calendar') . '"]' . "\n";
 			echo '        };' . "\n";
-			echo '    var langs = { Today:"' . __("Today") . '", Cancel:"' . __("Cancel") . '", Update:"' . __("Update") . '", OK:"' . __("OK") . '"};' . "\n";
+			echo '    var langs = { Today:"' . __('Today', 'schedule-posts-calendar') . '", Cancel:"' . __('Cancel', 'schedule-posts-calendar') . '", Update:"' . __('Update', 'schedule-posts-calendar') . '", OK:"' . __('OK', 'schedule-posts-calendar') . '"};' . "\n";
 			}
 		}
 	else
@@ -489,6 +501,13 @@ function schedule_posts_calendar_lang()
 	echo '    }' . "\n";
 	echo '</script>' . "\n";
 	}
+
+// Load the translations.
+add_action( 'init', 'schedule_posts_calendar_init' );
+
+function schedule_posts_calendar_init() {
+	load_plugin_textdomain( 'schedule-posts-calendar', false, false );
+}
 
 // Time to register the .css and .js pages, if we need to of course ;)
 
